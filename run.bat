@@ -1,0 +1,6 @@
+@echo off
+echo [*] Rebuilding server...
+go build -o main.exe ./cmd/server
+if %errorlevel% neq 0 exit /b %errorlevel%
+echo [*] Running server...
+main.exe
