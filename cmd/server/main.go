@@ -28,17 +28,11 @@ func main() {
 		w.Write([]byte("pong"))
 	})
 
-	r.Post("/products", product.CreateProductHandler)
-
-	r.Get("/products", product.GetProductsHandler)
-
-	r.Put("/products/{id}", product.UpdateProductHandler)
-
-	r.Delete("/products/{id}", product.DeleteProductHandler)
-
-	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("404 Not Found: %s %s", r.Method, r.URL.Path)
-		http.Error(w, "404 Not Found", http.StatusNotFound)
+	r.Route("/products", func(r chi.Router) {
+		r.Get("/", product.GetProductsHandler)
+		r.Post("/", product.CreateProductHandler)
+		r.Put("/{id}", product.UpdateProductHandler)
+		r.Delete("/{id}", product.DeleteProductHandler)
 	})
 
 	r.Route("/suppliers", func(r chi.Router) {
@@ -46,6 +40,11 @@ func main() {
 		r.Post("/", supplier.CreateSupplierHandler)
 		r.Put("/{id}", supplier.UpdateSupplierHandler)
 		r.Delete("/{id}", supplier.DeleteSupplierHandler)
+	})
+
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("404 Not Found: %s %s", r.Method, r.URL.Path)
+		http.Error(w, "404 Not Found", http.StatusNotFound)
 	})
 
 	port := os.Getenv("PORT")
