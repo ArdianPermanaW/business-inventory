@@ -7,6 +7,7 @@ import (
 
 	"cabbage-inventory/config"
 	"cabbage-inventory/internal/product"
+	"cabbage-inventory/internal/supplier"
 	"cabbage-inventory/pkg/db"
 
 	"github.com/go-chi/chi/v5"
@@ -38,6 +39,13 @@ func main() {
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("404 Not Found: %s %s", r.Method, r.URL.Path)
 		http.Error(w, "404 Not Found", http.StatusNotFound)
+	})
+
+	r.Route("/suppliers", func(r chi.Router) {
+		r.Get("/", supplier.GetSuppliersHandler)
+		r.Post("/", supplier.CreateSupplierHandler)
+		r.Put("/{id}", supplier.UpdateSupplierHandler)
+		r.Delete("/{id}", supplier.DeleteSupplierHandler)
 	})
 
 	port := os.Getenv("PORT")
