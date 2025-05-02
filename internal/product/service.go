@@ -13,7 +13,14 @@ func CreateProduct(p Product) error {
 }
 
 func GetAllProducts() ([]Product, error) {
-	rows, err := db.DB.Query("SELECT id, name, quantity, supplier_id FROM products")
+	query := `
+		SELECT 
+			p.id, p.name, p.quantity, p.supplier_id,
+			s.id, s.name
+		FROM products p
+		LEFT JOIN suppliers s ON p.supplier_id = s.id
+	`
+	rows, err := db.DB.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -23,10 +30,12 @@ func GetAllProducts() ([]Product, error) {
 
 	for rows.Next() {
 		var p Product
-		if err := rows.Scan(&p.ID, &p.Name, &p.Quantity, &p.SupplierID); err != nil {
+		var s SupplierDetails
+		if err := rows.Scan(&p.ID, &p.Name, &p.Quantity, &p.SupplierID, &s.ID, &s.Name); err != nil {
 			log.Println("Error scanning product:", err)
 			continue
 		}
+		p.Supplier = &s
 		products = append(products, p)
 	}
 
